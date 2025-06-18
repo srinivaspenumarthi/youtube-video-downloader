@@ -1,25 +1,28 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 const App: React.FC = () => {
+  const [inputValue, setInputValue] = useState('');
   const [videoId, setVideoId] = useState('');
-  const [quality, setQuality] = useState('720'); // Default 720p
+  const [selectedQuality, setSelectedQuality] = useState('720');
   const [downloadUrl, setDownloadUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const extractVideoId = (urlOrId: string) => {
+    const regex = /(?:youtube\\.com.*[?&]v=|youtu\\.be\\/)([a-zA-Z0-9_-]{11})/;
+    const match = urlOrId.match(regex);
+    return match ? match[1] : urlOrId;
+  };
+
   const handleDownload = async () => {
     setLoading(true);
     setError('');
-    setDownloadUrl('');
-
-    if (!videoId.trim()) {
-      setError('Please enter a valid YouTube Video ID.');
-      setLoading(false);
-      return;
-    }
+    const id = extractVideoId(inputValue);
+    setVideoId(id);
 
     try {
-      const url = `https://cloud-api-hub-youtube-downloader.p.rapidapi.com/mux?id=${videoId}&quality=${quality}&codec=h264&audioFormat=best&language=en`;
+      const url = `https://cloud-api-hub-youtube-downloader.p.rapidapi.com/mux?id=${id}&quality=${selectedQuality}&codec=h264&audioFormat=best&language=en`;
       const options = {
         method: 'GET',
         headers: {
@@ -32,109 +35,60 @@ const App: React.FC = () => {
 
       if (data.url) setDownloadUrl(data.url);
       else setError('Download URL not found.');
-    } catch (err) {
+    } catch {
       setError('Error fetching download link.');
     } finally {
       setLoading(false);
     }
   };
 
-  const renderThumbnail = () => {
-    if (!videoId) return null;
-    return (
-      <img
-        src={`https://img.youtube.com/vi/${videoId}/0.jpg`}
-        alt="Video Thumbnail"
-        style={{ width: '100%', borderRadius: 8, marginBottom: 10 }}
-      />
-    );
-  };
-
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f9fafb' }}>
-      <div style={{ background: '#fff', padding: 30, borderRadius: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', width: '90%', maxWidth: 400, textAlign: 'center' }}>
-        <h1 style={{ fontSize: 22, marginBottom: 15, color: '#111' }}>🎬 YouTube Video Downloader</h1>
-
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-gradient-to-r from-gray-900 to-gray-700 flex items-center justify-center">
+      <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl shadow-xl p-8 w-full max-w-md">
+        <h1 className="text-3xl font-bold text-white text-center mb-6">Premium YouTube Downloader</h1>
         <input
           type="text"
-          placeholder="Enter YouTube Video ID"
-          value={videoId}
-          onChange={(e) => setVideoId(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '10px 15px',
-            borderRadius: 8,
-            border: '1px solid #ddd',
-            marginBottom: 12,
-            fontSize: 14
-          }}
+          placeholder="Paste YouTube URL or ID"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          className="w-full p-3 rounded bg-white bg-opacity-20 placeholder-gray-300 text-white mb-4 focus:outline-none"
         />
-
         <select
-          value={quality}
-          onChange={(e) => setQuality(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '10px',
-            borderRadius: 8,
-            border: '1px solid #ddd',
-            marginBottom: 12,
-            fontSize: 14
-          }}
+          value={selectedQuality}
+          onChange={(e) => setSelectedQuality(e.target.value)}
+          className="w-full p-3 rounded bg-white bg-opacity-20 text-white mb-4 focus:outline-none"
         >
-          <option value="144">144p</option>
-          <option value="240">240p</option>
-          <option value="360">360p</option>
-          <option value="480">480p</option>
-          <option value="720">720p</option>
-          <option value="1080">1080p</option>
+          {['144','240','360','480','720','1080'].map(q => (
+            <option key={q} value={q}>{q}p</option>
+          ))}
         </select>
-
-        {renderThumbnail()}
-
         <button
           onClick={handleDownload}
           disabled={loading}
-          style={{
-            width: '100%',
-            padding: '12px 0',
-            background: loading ? '#9ca3af' : '#111827',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 8,
-            cursor: loading ? 'not-allowed' : 'pointer',
-            fontSize: 15,
-            fontWeight: 600,
-            transition: 'background 0.3s'
-          }}
+          className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded font-semibold transition duration-300"
         >
-          {loading ? 'Fetching Link...' : 'Get Download Link'}
+          {loading ? 'Processing...' : 'Get Download Link'}
         </button>
-
-        {downloadUrl && (
-          <div style={{ marginTop: 20 }}>
-            <a
-              href={downloadUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: '#2563EB', fontWeight: 600, display: 'block', marginBottom: 10 }}
-            >
-              🔗 Download Video
-            </a>
-            <a
-              href={`https://www.youtube.com/watch?v=${videoId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: '#6b7280', fontSize: 13, textDecoration: 'none' }}
-            >
-              ▶️ Watch on YouTube
-            </a>
-          </div>
+        {videoId && (
+          <img
+            src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+            alt="Video Preview"
+            className="w-full mt-4 rounded shadow-lg"
+          />
         )}
-
-        {error && <p style={{ color: 'red', marginTop: 12 }}>{error}</p>}
+        {downloadUrl && (
+          <a
+            href={downloadUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block mt-4 text-center text-green-300 underline"
+          >
+            Download Video
+          </a>
+        )}
+        {error && <p className="text-red-400 mt-2 text-center">{error}</p>}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
