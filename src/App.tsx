@@ -10,7 +10,7 @@ const App: React.FC = () => {
   const [error, setError] = useState('');
 
   const extractVideoId = (urlOrId: string) => {
-    const regex = /(?:youtube\\.com.*[?&]v=|youtu\\.be\\/)([a-zA-Z0-9_-]{11})/;
+    const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
     const match = urlOrId.match(regex);
     return match ? match[1] : urlOrId;
   };
