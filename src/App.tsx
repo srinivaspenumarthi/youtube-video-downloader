@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Lottie from 'lottie-react';
-import loadingAnimation from './Animation-1750332876998.json'; // Ensure correct filename without spaces
+import loadingAnimation from './Animation - 1750332876998.json'; // Ensure correct filename without spaces
 
 const App: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
