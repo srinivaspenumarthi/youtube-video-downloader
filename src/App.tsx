@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
-import loadingAnimation from './Animation - 1750332876998.json'; // Rename file without spaces for safety
+import loadingAnimation from './Animation - 1750332876998.json'; // Make sure to remove spaces in filename!
 
 const App: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
@@ -29,14 +29,18 @@ const App: React.FC = () => {
         method: 'GET',
         headers: {
           'x-rapidapi-host': 'ytstream-download-youtube-videos.p.rapidapi.com',
-          'x-rapidapi-key': import.meta.env.VITE_RAPIDAPI_KEY as string, // Or your real key here
+          'x-rapidapi-key': import.meta.env.VITE_RAPIDAPI_KEY as string, // Place your real key here or in .env
         },
       };
       const res = await fetch(url, options);
       const data = await res.json();
 
-      if (data && data.formats) {
-        setDownloadLinks(data.formats);
+      if (data && (data.formats || data.adaptiveFormats)) {
+        const combinedFormats = [
+          ...(data.formats || []),
+          ...(data.adaptiveFormats || []),
+        ];
+        setDownloadLinks(combinedFormats);
       } else {
         setError('No download links found.');
       }
@@ -51,6 +55,7 @@ const App: React.FC = () => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-gradient-to-r from-purple-900 to-indigo-800 flex items-center justify-center p-4">
       <div className="bg-white bg-opacity-10 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 w-full max-w-md">
         <h1 className="text-4xl font-extrabold text-white text-center mb-6 tracking-wide">Premium YouTube Downloader</h1>
+        
         <input
           type="text"
           placeholder="Paste YouTube URL or ID"
@@ -58,6 +63,7 @@ const App: React.FC = () => {
           onChange={(e) => setInputValue(e.target.value)}
           className="w-full p-4 rounded-xl bg-white bg-opacity-20 placeholder-gray-300 text-white mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
+
         <button
           onClick={handleDownload}
           disabled={loading}
@@ -66,7 +72,11 @@ const App: React.FC = () => {
           {loading ? 'Processing...' : 'Get Download Links'}
         </button>
 
-        {loading && <div className="flex justify-center mt-4"><Lottie animationData={loadingAnimation} style={{ width: 100, height: 100 }} /></div>}
+        {loading && (
+          <div className="flex justify-center mt-4">
+            <Lottie animationData={loadingAnimation} style={{ width: 100, height: 100 }} />
+          </div>
+        )}
 
         {videoId && !loading && (
           <img
@@ -87,13 +97,15 @@ const App: React.FC = () => {
                 rel="noopener noreferrer"
                 className="block bg-green-500 hover:bg-green-600 text-white text-center py-2 px-4 rounded-xl mb-2 transition"
               >
-                {link.qualityLabel || 'Unknown Quality'} ({link.mimeType})
+                {link.qualityLabel || 'Unknown Quality'} ({link.mimeType?.split(';')[0]})
               </a>
             ))}
           </div>
         )}
 
-        {error && <p className="text-red-400 mt-2 text-center font-semibold">{error}</p>}
+        {error && (
+          <p className="text-red-400 mt-2 text-center font-semibold">{error}</p>
+        )}
       </div>
     </motion.div>
   );
