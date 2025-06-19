@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
-import loadingAnimation from './Animation - 1750332876998.json'; // Make sure to remove spaces in filename!
+import loadingAnimation from './Animation - 1750332876998.json'; // Rename file correctly (no spaces)
 
 const App: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
@@ -29,7 +29,7 @@ const App: React.FC = () => {
         method: 'GET',
         headers: {
           'x-rapidapi-host': 'ytstream-download-youtube-videos.p.rapidapi.com',
-          'x-rapidapi-key': import.meta.env.VITE_RAPIDAPI_KEY as string, // Place your real key here or in .env
+          'x-rapidapi-key': import.meta.env.VITE_RAPIDAPI_KEY as string,
         },
       };
       const res = await fetch(url, options);
@@ -52,32 +52,52 @@ const App: React.FC = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-gradient-to-r from-purple-900 to-indigo-800 flex items-center justify-center p-4">
-      <div className="bg-white bg-opacity-10 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 w-full max-w-md">
-        <h1 className="text-4xl font-extrabold text-white text-center mb-6 tracking-wide">Premium YouTube Downloader</h1>
-        
-        <input
-          type="text"
-          placeholder="Paste YouTube URL or ID"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          className="w-full p-4 rounded-xl bg-white bg-opacity-20 placeholder-gray-300 text-white mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      className="min-h-screen bg-gradient-to-r from-purple-900 via-indigo-800 to-purple-900 flex items-center justify-center p-4 relative"
+    >
+      {/* Lottie Loading Overlay */}
+      {loading && (
+        <motion.div 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }} 
+          className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-3xl z-50"
+        >
+          <Lottie animationData={loadingAnimation} style={{ width: 120, height: 120 }} />
+        </motion.div>
+      )}
 
-        <button
+      <div className="bg-white bg-opacity-10 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 w-full max-w-md relative z-10">
+        <h1 className="text-4xl font-extrabold text-white text-center mb-6 tracking-wide">Premium YouTube Downloader</h1>
+
+        {/* Floating Label Input */}
+        <div className="relative w-full mb-4">
+          <input
+            type="text"
+            id="youtube-url"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            required
+            className="peer w-full p-4 rounded-xl bg-white bg-opacity-10 placeholder-transparent text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            placeholder="Paste URL"
+          />
+          <label htmlFor="youtube-url" className="absolute left-4 top-4 text-gray-300 text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-[-10px] peer-focus:text-xs peer-focus:text-purple-300">
+            Paste YouTube URL or ID
+          </label>
+        </div>
+
+        {/* Download Button */}
+        <motion.button
+          whileTap={{ scale: 0.95 }}
           onClick={handleDownload}
           disabled={loading}
-          className="w-full py-3 bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white rounded-xl font-bold shadow-lg transition duration-300"
+          className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-xl font-bold shadow-xl transition duration-300"
         >
           {loading ? 'Processing...' : 'Get Download Links'}
-        </button>
+        </motion.button>
 
-        {loading && (
-          <div className="flex justify-center mt-4">
-            <Lottie animationData={loadingAnimation} style={{ width: 100, height: 100 }} />
-          </div>
-        )}
-
+        {/* Video Preview */}
         {videoId && !loading && (
           <img
             src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
@@ -86,25 +106,38 @@ const App: React.FC = () => {
           />
         )}
 
+        {/* Download Links as Beautiful Cards */}
         {downloadLinks.length > 0 && (
-          <div className="mt-4">
-            <h2 className="text-white text-center mb-2 font-semibold">Available Formats:</h2>
+          <div className="mt-6 space-y-4">
+            <h2 className="text-white text-center font-semibold text-lg">Available Formats:</h2>
             {downloadLinks.map((link, index) => (
-              <a
+              <motion.div
                 key={index}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block bg-green-500 hover:bg-green-600 text-white text-center py-2 px-4 rounded-xl mb-2 transition"
+                whileHover={{ scale: 1.02 }}
+                className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-4 shadow-lg flex justify-between items-center transition cursor-pointer"
               >
-                {link.qualityLabel || 'Unknown Quality'} ({link.mimeType?.split(';')[0]})
-              </a>
+                <div>
+                  <p className="text-white font-semibold">
+                    {link.qualityLabel || 'Unknown Quality'}
+                  </p>
+                  <p className="text-gray-300 text-sm">{link.mimeType?.split(';')[0]}</p>
+                </div>
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white py-2 px-4 rounded-xl shadow transition"
+                >
+                  Download
+                </a>
+              </motion.div>
             ))}
           </div>
         )}
 
+        {/* Error */}
         {error && (
-          <p className="text-red-400 mt-2 text-center font-semibold">{error}</p>
+          <p className="text-red-400 mt-4 text-center font-semibold">{error}</p>
         )}
       </div>
     </motion.div>
