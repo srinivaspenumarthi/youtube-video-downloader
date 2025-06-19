@@ -14,7 +14,7 @@ interface VideoFormat {
   itag?: number;
 }
 
-const Index: React.FC = () => {
+const App: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [videoId, setVideoId] = useState('');
   const [downloadLinks, setDownloadLinks] = useState<VideoFormat[]>([]);
