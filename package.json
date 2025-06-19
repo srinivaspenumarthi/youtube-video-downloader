@@ -1,27 +1,50 @@
 {
-  "name": "youtube-downloader-app",
+  "name": "youtube-downloader-pro",
   "version": "1.0.0",
   "private": true,
+  "description": "A Premium YouTube Downloader with Pro-level UI/UX inspired by Apple and Google design principles.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "framer-motion": "^11.0.0",
     "lottie-react": "^2.3.1",
-    "react-hot-toast": "^2.4.0"
+    "react-hot-toast": "^2.4.0",
+    "lucide-react": "^0.276.0"  // You are using Lucide icons
   },
   "devDependencies": {
-    "typescript": "^5.0.2",
-    "vite": "^4.0.0",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
-    "@vitejs/plugin-react": "^4.0.0",
-    "tailwindcss": "^3.4.0",
-    "postcss": "^8.4.0",
-    "autoprefixer": "^10.4.0"
-  }
+    "typescript": "^5.4.0",
+    "vite": "^5.0.0",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^5.0.1",
+    "tailwindcss": "^3.4.1",
+    "postcss": "^8.4.31",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.56.0",              // For code quality
+    "eslint-plugin-react": "^7.33.2", // React-specific linting
+    "prettier": "^3.3.1"              // Code formatting
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "YouTube",
+    "Downloader",
+    "React",
+    "Vite",
+    "TailwindCSS",
+    "Framer Motion",
+    "Lottie",
+    "Premium"
+  ],
+  "author": "Your Name or Company",
+  "license": "MIT"
 }
