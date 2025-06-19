@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
-import loadingAnimation from './Animation - 1750332876998.json'; // Ensure you have this Lottie JSON file
+import loadingAnimation from './animation.json'; // Rename file without spaces for safety
 
 const App: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [videoId, setVideoId] = useState('');
-  const [selectedQuality, setSelectedQuality] = useState('720');
-  const [downloadUrl, setDownloadUrl] = useState('');
+  const [downloadLinks, setDownloadLinks] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -20,25 +19,29 @@ const App: React.FC = () => {
   const handleDownload = async () => {
     setLoading(true);
     setError('');
+    setDownloadLinks([]);
     const id = extractVideoId(inputValue);
     setVideoId(id);
 
     try {
-      const url = `https://cloud-api-hub-youtube-downloader.p.rapidapi.com/mux?id=${id}&quality=${selectedQuality}&codec=h264&audioFormat=best&language=en`;
+      const url = `https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${id}`;
       const options = {
         method: 'GET',
         headers: {
-          'x-rapidapi-host': 'cloud-api-hub-youtube-downloader.p.rapidapi.com',
-          'x-rapidapi-key': import.meta.env.VITE_RAPIDAPI_KEY as string,
+          'x-rapidapi-host': 'ytstream-download-youtube-videos.p.rapidapi.com',
+          'x-rapidapi-key': import.meta.env.VITE_RAPIDAPI_KEY as string, // Or your real key here
         },
       };
       const res = await fetch(url, options);
       const data = await res.json();
 
-      if (data.url) setDownloadUrl(data.url);
-      else setError('Download URL not found.');
+      if (data && data.formats) {
+        setDownloadLinks(data.formats);
+      } else {
+        setError('No download links found.');
+      }
     } catch {
-      setError('Error fetching download link.');
+      setError('Error fetching download links.');
     } finally {
       setLoading(false);
     }
@@ -55,23 +58,16 @@ const App: React.FC = () => {
           onChange={(e) => setInputValue(e.target.value)}
           className="w-full p-4 rounded-xl bg-white bg-opacity-20 placeholder-gray-300 text-white mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
-        <select
-          value={selectedQuality}
-          onChange={(e) => setSelectedQuality(e.target.value)}
-          className="w-full p-4 rounded-xl bg-white bg-opacity-20 text-white mb-4 focus:outline-none"
-        >
-          {['144','240','360','480','720','1080'].map(q => (
-            <option key={q} value={q}>{q}p</option>
-          ))}
-        </select>
         <button
           onClick={handleDownload}
           disabled={loading}
           className="w-full py-3 bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white rounded-xl font-bold shadow-lg transition duration-300"
         >
-          {loading ? 'Processing...' : 'Get Download Link'}
+          {loading ? 'Processing...' : 'Get Download Links'}
         </button>
+
         {loading && <div className="flex justify-center mt-4"><Lottie animationData={loadingAnimation} style={{ width: 100, height: 100 }} /></div>}
+
         {videoId && !loading && (
           <img
             src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
@@ -79,16 +75,24 @@ const App: React.FC = () => {
             className="w-full mt-4 rounded-xl shadow-xl"
           />
         )}
-        {downloadUrl && (
-          <a
-            href={downloadUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block mt-4 text-center text-green-300 underline hover:text-green-400 transition"
-          >
-            Download Video
-          </a>
+
+        {downloadLinks.length > 0 && (
+          <div className="mt-4">
+            <h2 className="text-white text-center mb-2 font-semibold">Available Formats:</h2>
+            {downloadLinks.map((link, index) => (
+              <a
+                key={index}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block bg-green-500 hover:bg-green-600 text-white text-center py-2 px-4 rounded-xl mb-2 transition"
+              >
+                {link.qualityLabel || 'Unknown Quality'} ({link.mimeType})
+              </a>
+            ))}
+          </div>
         )}
+
         {error && <p className="text-red-400 mt-2 text-center font-semibold">{error}</p>}
       </div>
     </motion.div>
