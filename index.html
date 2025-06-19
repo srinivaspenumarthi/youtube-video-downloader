@@ -5,17 +5,32 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#4f46e5" />
-    <meta name="description" content="Premium YouTube Video Downloader with smooth UI/UX and instant link generation." />
+    <meta name="description" content="Premium YouTube Video Downloader with Apple-level smooth UI/UX, Lottie animations, glassmorphism and instant download link generation." />
     <title>Premium YouTube Downloader</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <!-- SEO Improvement -->
+    <meta property="og:title" content="Premium YouTube Downloader" />
+    <meta property="og:description" content="Download YouTube videos in high quality with elegant UI, animations, and instant link fetching." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/preview.png" /> <!-- optional preview image -->
+    
+    <!-- PWA Ready (Optional Future-Proofing) -->
+    <link rel="manifest" href="/manifest.json" />
+
     <style>
       body {
         font-family: 'Inter', sans-serif;
+        background: linear-gradient(to right, #4f46e5, #7c3aed); /* Purple-Indigo smooth gradient fallback */
       }
     </style>
   </head>
-  <body class="bg-gradient-to-r from-purple-900 to-indigo-800">
+  <body class="bg-gradient-to-r from-purple-900 to-indigo-800 min-h-screen">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
