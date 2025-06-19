@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import Lottie from 'lottie-react';
+import loadingAnimation from './Animation - 1750332876998.json'; // Ensure you have this Lottie JSON file
 
 const App: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
@@ -43,20 +45,20 @@ const App: React.FC = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-gradient-to-r from-gray-900 to-gray-700 flex items-center justify-center">
-      <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl shadow-xl p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-white text-center mb-6">Premium YouTube Downloader</h1>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-gradient-to-r from-purple-900 to-indigo-800 flex items-center justify-center p-4">
+      <div className="bg-white bg-opacity-10 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 w-full max-w-md">
+        <h1 className="text-4xl font-extrabold text-white text-center mb-6 tracking-wide">Premium YouTube Downloader</h1>
         <input
           type="text"
           placeholder="Paste YouTube URL or ID"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          className="w-full p-3 rounded bg-white bg-opacity-20 placeholder-gray-300 text-white mb-4 focus:outline-none"
+          className="w-full p-4 rounded-xl bg-white bg-opacity-20 placeholder-gray-300 text-white mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
         <select
           value={selectedQuality}
           onChange={(e) => setSelectedQuality(e.target.value)}
-          className="w-full p-3 rounded bg-white bg-opacity-20 text-white mb-4 focus:outline-none"
+          className="w-full p-4 rounded-xl bg-white bg-opacity-20 text-white mb-4 focus:outline-none"
         >
           {['144','240','360','480','720','1080'].map(q => (
             <option key={q} value={q}>{q}p</option>
@@ -65,15 +67,16 @@ const App: React.FC = () => {
         <button
           onClick={handleDownload}
           disabled={loading}
-          className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded font-semibold transition duration-300"
+          className="w-full py-3 bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white rounded-xl font-bold shadow-lg transition duration-300"
         >
           {loading ? 'Processing...' : 'Get Download Link'}
         </button>
-        {videoId && (
+        {loading && <div className="flex justify-center mt-4"><Lottie animationData={loadingAnimation} style={{ width: 100, height: 100 }} /></div>}
+        {videoId && !loading && (
           <img
             src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
             alt="Video Preview"
-            className="w-full mt-4 rounded shadow-lg"
+            className="w-full mt-4 rounded-xl shadow-xl"
           />
         )}
         {downloadUrl && (
@@ -81,12 +84,12 @@ const App: React.FC = () => {
             href={downloadUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="block mt-4 text-center text-green-300 underline"
+            className="block mt-4 text-center text-green-300 underline hover:text-green-400 transition"
           >
             Download Video
           </a>
         )}
-        {error && <p className="text-red-400 mt-2 text-center">{error}</p>}
+        {error && <p className="text-red-400 mt-2 text-center font-semibold">{error}</p>}
       </div>
     </motion.div>
   );
