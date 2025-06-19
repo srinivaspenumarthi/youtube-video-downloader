@@ -16,7 +16,7 @@
     "framer-motion": "^11.0.0",
     "lottie-react": "^2.3.1",
     "react-hot-toast": "^2.4.0",
-    "lucide-react": "^0.276.0"  // You are using Lucide icons
+    "lucide-react": "^0.276.0"
   },
   "devDependencies": {
     "typescript": "^5.4.0",
@@ -27,9 +27,9 @@
     "tailwindcss": "^3.4.1",
     "postcss": "^8.4.31",
     "autoprefixer": "^10.4.16",
-    "eslint": "^8.56.0",              // For code quality
-    "eslint-plugin-react": "^7.33.2", // React-specific linting
-    "prettier": "^3.3.1"              // Code formatting
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.33.2",
+    "prettier": "^3.3.1"
   },
   "engines": {
     "node": ">=18.0.0",
