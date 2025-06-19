@@ -1,5 +1,7 @@
+
+
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Lottie from 'lottie-react';
 import loadingAnimation from './Animation - 1750332876998.json'; // Rename file correctly (no spaces)
 
@@ -9,6 +11,7 @@ const App: React.FC = () => {
   const [downloadLinks, setDownloadLinks] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [activeVideo, setActiveVideo] = useState<string | null>(null);
 
   const extractVideoId = (urlOrId: string) => {
     const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
@@ -55,34 +58,37 @@ const App: React.FC = () => {
     <motion.div 
       initial={{ opacity: 0 }} 
       animate={{ opacity: 1 }} 
-      className="min-h-screen bg-gradient-to-r from-purple-900 via-indigo-800 to-purple-900 flex items-center justify-center p-4 relative"
+      className="min-h-screen bg-gradient-to-r from-purple-900 to-indigo-800 flex flex-col items-center justify-center p-4 relative"
     >
       {/* Lottie Loading Overlay */}
-      {loading && (
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-3xl z-50"
-        >
-          <Lottie animationData={loadingAnimation} style={{ width: 120, height: 120 }} />
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {loading && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
+          >
+            <Lottie animationData={loadingAnimation} style={{ width: 150, height: 150 }} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <div className="bg-white bg-opacity-10 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 w-full max-w-md relative z-10">
-        <h1 className="text-4xl font-extrabold text-white text-center mb-6 tracking-wide">Premium YouTube Downloader</h1>
+      <div className="bg-white bg-opacity-10 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 w-full max-w-2xl relative z-10">
+        <h1 className="text-5xl font-extrabold text-white text-center mb-8 tracking-wide">Premium YouTube Downloader</h1>
 
-        {/* Floating Label Input */}
-        <div className="relative w-full mb-4">
+        {/* Input Field Full width Apple-style */}
+        <div className="relative w-full mb-6">
           <input
             type="text"
             id="youtube-url"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             required
-            className="peer w-full p-4 rounded-xl bg-white bg-opacity-10 placeholder-transparent text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            placeholder="Paste URL"
+            className="peer w-full p-5 rounded-xl bg-white bg-opacity-20 placeholder-transparent text-white focus:outline-none focus:ring-4 focus:ring-purple-500 text-lg"
+            placeholder="Paste YouTube URL or ID"
           />
-          <label htmlFor="youtube-url" className="absolute left-4 top-4 text-gray-300 text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-[-10px] peer-focus:text-xs peer-focus:text-purple-300">
+          <label htmlFor="youtube-url" className="absolute left-5 top-4 text-gray-300 text-base transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-[-10px] peer-focus:text-sm peer-focus:text-purple-300">
             Paste YouTube URL or ID
           </label>
         </div>
@@ -92,31 +98,42 @@ const App: React.FC = () => {
           whileTap={{ scale: 0.95 }}
           onClick={handleDownload}
           disabled={loading}
-          className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-xl font-bold shadow-xl transition duration-300"
+          className="w-full py-4 bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white rounded-xl font-bold shadow-xl transition text-xl"
         >
           {loading ? 'Processing...' : 'Get Download Links'}
         </motion.button>
 
-        {/* Video Preview */}
-        {videoId && !loading && (
-          <img
-            src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
-            alt="Video Preview"
-            className="w-full mt-4 rounded-xl shadow-xl"
-          />
-        )}
+        {/* Video Preview as Fullscreen Popup */}
+        <AnimatePresence>
+          {activeVideo && (
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+              onClick={() => setActiveVideo(null)}
+            >
+              <iframe
+                src={`https://www.youtube.com/embed/${activeVideo}`}
+                className="w-full h-full max-w-5xl max-h-[80vh] rounded-xl shadow-xl"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+              ></iframe>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Download Links as Beautiful Cards */}
+        {/* Download Links Display */}
         {downloadLinks.length > 0 && (
-          <div className="mt-6 space-y-4">
-            <h2 className="text-white text-center font-semibold text-lg">Available Formats:</h2>
+          <div className="mt-8 space-y-4">
+            <h2 className="text-white text-center font-semibold text-2xl">Available Formats:</h2>
             {downloadLinks.map((link, index) => (
               <motion.div
                 key={index}
-                whileHover={{ scale: 1.02 }}
+                whileHover={{ scale: 1.03 }}
                 className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-4 shadow-lg flex justify-between items-center transition cursor-pointer"
               >
-                <div>
+                <div onClick={() => setActiveVideo(videoId)}>
                   <p className="text-white font-semibold">
                     {link.qualityLabel || 'Unknown Quality'}
                   </p>
@@ -126,7 +143,7 @@ const App: React.FC = () => {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white py-2 px-4 rounded-xl shadow transition"
+                  className="bg-gradient-to-r from-pink-400 to-purple-500 hover:from-pink-500 hover:to-purple-600 text-white py-2 px-4 rounded-xl shadow transition"
                 >
                   Download
                 </a>
@@ -135,9 +152,8 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* Error */}
         {error && (
-          <p className="text-red-400 mt-4 text-center font-semibold">{error}</p>
+          <p className="text-red-400 mt-4 text-center font-semibold text-lg">{error}</p>
         )}
       </div>
     </motion.div>
